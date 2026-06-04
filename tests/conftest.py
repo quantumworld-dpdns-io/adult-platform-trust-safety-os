@@ -9,7 +9,6 @@ import fakeredis.aioredis
 import httpx
 import pytest
 
-from src.api.app import create_app
 from src.audit.models import ActionType, ActorType
 from tests.factories import (
     AuditEventFactory,
