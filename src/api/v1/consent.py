@@ -10,9 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import get_current_active_user, get_db_session
 from src.api.exceptions import NotFoundError
-from src.api.schemas.common import PaginatedResponse
-from src.api.schemas.user import UserResponse
-from src.core.consent import Consent, ConsentType
+from src.core.consent import Consent
 from src.core.user import User
 
 logger = structlog.get_logger(__name__)
