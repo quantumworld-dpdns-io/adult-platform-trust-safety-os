@@ -1,0 +1,34 @@
+*** Settings ***
+Suite Setup    Suite Setup
+Suite Teardown    Suite Teardown
+Task Timeout    300s
+
+*** Variables ***
+${API_BASE_URL}    https://api.adult-platform.local
+${ADMIN_EMAIL}    admin@adult-platform.local
+${ADMIN_PASSWORD}    ${ADMIN_PASSWORD_SECRET}
+${TEST_USER_EMAIL}    test@example.com
+${TEST_USER_PASSWORD}    ${TEST_USER_PASSWORD_SECRET}
+
+*** Tasks ***
+Run OWASP Top 10 Security Tests
+    [Documentation]    Execute all OWASP Top 10 security test suites
+    Run Directory    ${CURDIR}/security/owasp_top10
+
+Run Functional Security Tests
+    [Documentation]    Execute all functional security test suites
+    Run Directory    ${CURDIR}/security/functional
+
+Run API Security Tests
+    [Documentation]    Execute all API security test suites
+    Run Directory    ${CURDIR}/security/api
+
+*** Keywords ***
+Suite Setup
+    [Documentation]    Initialize test environment
+    Log    Starting security test execution
+    Set Global Variable    ${API_BASE_URL}    https://api.adult-platform.local
+
+Suite Teardown
+    [Documentation]    Cleanup after test execution
+    Log    Security test execution completed
