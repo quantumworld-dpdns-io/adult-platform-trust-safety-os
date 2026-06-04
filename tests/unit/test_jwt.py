@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
-import time
 from datetime import datetime, timedelta, timezone
-from unittest.mock import patch
 
+import jose
 import pytest
 from jose import jwt
 
 from tests.helpers import generate_test_jwt
 
-SECRET = "test-jwt-secret-for-unit-tests"
+SECRET = "test-secret-key-for-testing-only"
 ALGORITHM = "HS256"
 
 
@@ -41,7 +40,7 @@ def test_create_refresh_token():
 
 
 def test_verify_valid_token():
-    token = generate_test_jwt(subject="user-123", roles=["admin"])
+    token = generate_test_jwt(subject="user-123", roles=["admin"], secret=SECRET)
     payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
     assert payload["sub"] == "user-123"
     assert payload["type"] == "access"
@@ -62,7 +61,7 @@ def test_verify_expired_token():
 
 
 def test_decode_token():
-    token = generate_test_jwt(subject="decode-test", roles=["user", "moderator"])
+    token = generate_test_jwt(subject="decode-test", roles=["user", "moderator"], secret=SECRET)
     payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
     assert payload["sub"] == "decode-test"
     assert set(payload["roles"]) == {"user", "moderator"}
@@ -72,13 +71,13 @@ def test_decode_token():
 
 
 def test_decode_with_wrong_secret():
-    token = generate_test_jwt(subject="wrong-secret-test")
+    token = generate_test_jwt(subject="wrong-secret-test", secret=SECRET)
     with pytest.raises(jose.JWTError):
         jwt.decode(token, "wrong-secret", algorithms=[ALGORITHM])
 
 
 def test_token_claims_structure():
-    token = generate_test_jwt(subject="claims-test", roles=["user"])
+    token = generate_test_jwt(subject="claims-test", roles=["user"], secret=SECRET)
     payload = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
     assert "sub" in payload
     assert "iat" in payload
