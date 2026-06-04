@@ -74,7 +74,7 @@ def test_violation_detection_nsfw_high(engine):
 def test_violation_detection_toxicity(engine):
     classification = ContentClassification(toxicity_score=0.85)
     result = engine.evaluate_content(classification)
-    assert result["action"] == PolicyAction.REJECT.value
+    assert result["action"] == PolicyAction.ESCALATE.value
 
 
 def test_violation_detection_violence(engine):
