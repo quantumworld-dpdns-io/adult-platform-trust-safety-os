@@ -1,0 +1,34 @@
+# Robot Framework Test Settings
+# API Configuration
+api_base_url: https://api.adult-platform.local
+api_timeout: 30s
+
+# Authentication
+admin_email: admin@adult-platform.local
+admin_password: ${ADMIN_PASSWORD_SECRET}
+test_user_email: test@example.com
+test_user_password: ${TEST_USER_PASSWORD_SECRET}
+
+# Retry Configuration
+retry_count: 3
+retry_delay: 1s
+
+# Logging
+log_level: INFO
+log_dir: logs/robot
+
+# Output
+output_dir: output/robot
+output_format: XML,HTML,JSON
+
+# Security Settings
+verify_ssl: true
+max_response_time_ms: 5000
+
+# Rate Limiting
+rate_limit_requests: 100
+rate_limit_window_seconds: 60
+
+# Session Settings
+session_timeout: 3600
+max_concurrent_sessions: 3
