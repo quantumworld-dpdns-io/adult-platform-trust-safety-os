@@ -1,0 +1,126 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: audit-retention
+  labels:
+    app.kubernetes.io/name: adult-platform-trust-safety
+    app.kubernetes.io/component: jobs
+spec:
+  schedule: "0 2 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app: audit-retention
+        spec:
+          serviceAccountName: api-server
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          restartPolicy: OnFailure
+          containers:
+            - name: audit-retention
+              image: ghcr.io/quantumworld-dpdns-io/adult-platform-trust-safety:latest
+              command:
+                - python
+                - -m
+                - src.cli.audit_commands
+                - retention
+                - --days
+                - "365"
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: api-secrets
+                      key: database-url
+                - name: ENVIRONMENT
+                  value: production
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: data-export
+  labels:
+    app.kubernetes.io/name: adult-platform-trust-safety
+    app.kubernetes.io/component: jobs
+spec:
+  schedule: "0 0 1 * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app: data-export
+        spec:
+          serviceAccountName: api-server
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          restartPolicy: OnFailure
+          containers:
+            - name: data-export
+              image: ghcr.io/quantumworld-dpdns-io/adult-platform-trust-safety:latest
+              command:
+                - python
+                - -m
+                - src.cli.audit_commands
+                - export
+                - --format
+                - parquet
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: api-secrets
+                      key: database-url
+                - name: MINIO_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: api-secrets
+                      key: minio-endpoint
+                - name: ENVIRONMENT
+                  value: production
+              resources:
+                requests:
+                  cpu: 250m
+                  memory: 512Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
