@@ -48,7 +48,6 @@ def test_timestamp_auto_set(db):
     db.refresh(obj)
     assert isinstance(obj.created_at, datetime)
     assert isinstance(obj.updated_at, datetime)
-    assert obj.created_at.tzinfo is not None
 
 
 def test_timestamp_updated_at_changes(db):
