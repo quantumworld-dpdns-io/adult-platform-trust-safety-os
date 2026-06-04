@@ -10,8 +10,6 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
- CoppaRecords = dict[str, dict[str, Any]]
-
 _child_store: dict[str, dict[str, Any]] = {}
 _parental_consent_store: dict[str, dict[str, Any]] = {}
 
