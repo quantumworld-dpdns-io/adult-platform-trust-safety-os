@@ -7,17 +7,11 @@ from datetime import datetime, timezone
 
 import factory
 
-from src.audit.models import ActionType, ActorType, AuditEvent
-from src.core.consent import Consent, ConsentType
-from src.core.session import UserSession
-from src.core.user import User
-from src.moderation.content import Content, ContentStatus, ContentType
-from src.moderation.report import Report, ReportStatus
-
 
 class UserFactory(factory.Factory):
     class Meta:
-        model = User
+        lazy_import = True
+        model = "src.core.user:User"
 
     email = factory.LazyAttribute(lambda o: f"{o.username}@example.com")
     username = factory.Sequence(lambda n: f"user_{n}")
@@ -36,29 +30,15 @@ class UserFactory(factory.Factory):
     profile = None
 
 
-class ContentFactory(factory.Factory):
-    class Meta:
-        model = Content
-
-    id = factory.LazyFunction(uuid.uuid4)
-    submitter_id = factory.LazyFunction(lambda: str(uuid.uuid4()))
-    content_type = ContentType.TEXT
-    raw_content = "Test content"
-    metadata = None
-    status = ContentStatus.PENDING
-    moderation_score = None
-    reviewed_at = None
-    reviewed_by = None
-
-
 class AuditEventFactory(factory.Factory):
     class Meta:
-        model = AuditEvent
+        lazy_import = True
+        model = "src.audit.models:AuditEvent"
 
     id = factory.LazyFunction(uuid.uuid4)
     actor_id = factory.LazyFunction(lambda: str(uuid.uuid4()))
-    actor_type = ActorType.USER
-    action = ActionType.CREATE
+    actor_type = factory.LazyFunction(lambda: __import__("src.audit.models", fromlist=["ActorType"]).ActorType.USER)
+    action = factory.LazyFunction(lambda: __import__("src.audit.models", fromlist=["ActionType"]).ActionType.CREATE)
     resource_type = None
     resource_id = None
     details = None
@@ -68,13 +48,28 @@ class AuditEventFactory(factory.Factory):
     integrity_hash = None
 
 
+class ContentFactory(factory.Factory):
+    class Meta:
+        lazy_import = True
+        model = "src.moderation.content:Content"
+
+    submitter_id = factory.LazyFunction(lambda: str(uuid.uuid4()))
+    content_type = factory.LazyFunction(lambda: __import__("src.moderation.content", fromlist=["ContentType"]).ContentType.TEXT)
+    raw_content = "Test content"
+    status = factory.LazyFunction(lambda: __import__("src.moderation.content", fromlist=["ContentStatus"]).ContentStatus.PENDING)
+    moderation_score = None
+    reviewed_at = None
+    reviewed_by = None
+
+
 class ConsentFactory(factory.Factory):
     class Meta:
-        model = Consent
+        lazy_import = True
+        model = "src.core.consent:Consent"
 
     id = factory.LazyFunction(uuid.uuid4)
     user_id = factory.LazyFunction(uuid.uuid4)
-    consent_type = ConsentType.CONTENT.value
+    consent_type = "content"
     granted = True
     granted_at = factory.LazyFunction(lambda: datetime.now(timezone.utc))
     withdrawn_at = None
@@ -85,7 +80,8 @@ class ConsentFactory(factory.Factory):
 
 class ReportFactory(factory.Factory):
     class Meta:
-        model = Report
+        lazy_import = True
+        model = "src.moderation.report:Report"
 
     id = factory.LazyFunction(uuid.uuid4)
     reporter_id = factory.LazyFunction(lambda: str(uuid.uuid4()))
@@ -93,14 +89,15 @@ class ReportFactory(factory.Factory):
     target_user_id = None
     reason = "spam"
     description = "This is spam content"
-    status = ReportStatus.PENDING
+    status = factory.LazyFunction(lambda: __import__("src.moderation.report", fromlist=["ReportStatus"]).ReportStatus.PENDING)
     resolved_at = None
     resolved_by = None
 
 
 class UserSessionFactory(factory.Factory):
     class Meta:
-        model = UserSession
+        lazy_import = True
+        model = "src.core.session:UserSession"
 
     id = factory.LazyFunction(uuid.uuid4)
     user_id = factory.LazyFunction(uuid.uuid4)
