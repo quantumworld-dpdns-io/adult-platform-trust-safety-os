@@ -102,7 +102,7 @@ class BaseAgent:
         tools_section = f"\nAvailable tools:\n{tool_descriptions}" if tool_descriptions else ""
 
         messages = [
-            {"role": "system", "content": self.system_prompt + memory_section + tools_section},
+            {"role": "system", "content": self.system_prompt + memory_context + tools_section},
             {"role": "user", "content": input_data},
         ]
 
