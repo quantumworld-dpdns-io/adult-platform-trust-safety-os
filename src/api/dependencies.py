@@ -90,6 +90,6 @@ def require_role(*roles: str) -> Callable[..., Any]:
 
 async def get_audit_logger(
     session: AsyncSession = Depends(get_db_session),
-) -> Any:
+) -> AuditLogger:
     from src.audit.logger import AuditLogger
     return AuditLogger(session)
