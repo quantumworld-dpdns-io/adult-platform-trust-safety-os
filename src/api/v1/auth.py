@@ -21,7 +21,7 @@ from src.api.schemas.auth import (
 )
 from src.api.schemas.common import SuccessResponse
 from src.auth.jwt import create_access_token, create_refresh_token, verify_token
-from src.auth.mfa import enable_mfa, generate_backup_codes, generate_mfa_secret, get_provisioning_uri, hash_backup_codes, verify_totp
+from src.auth.mfa import generate_backup_codes, generate_mfa_secret, get_provisioning_uri, hash_backup_codes, verify_totp
 from src.config.settings import settings
 from src.core.user import User
 
