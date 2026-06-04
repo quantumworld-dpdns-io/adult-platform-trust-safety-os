@@ -8,7 +8,7 @@ from passlib.hash import argon2
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.dependencies import get_current_active_user, get_db_session, get_redis
+from src.api.dependencies import get_current_active_user, get_db_session
 from src.api.exceptions import AuthenticationError, ValidationException
 from src.api.schemas.auth import (
     LoginRequest,
