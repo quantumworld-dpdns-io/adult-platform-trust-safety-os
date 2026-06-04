@@ -6,7 +6,7 @@ import hashlib
 import hmac
 import secrets
 import string
-from typing import Literal
+from typing import Any, Literal
 
 from argon2 import PasswordHasher, Type
 from argon2.exceptions import VerifyMismatchError, VerificationError
