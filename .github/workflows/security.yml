@@ -1,0 +1,130 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  sast-semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/default
+            p/python
+            p/fastapi
+            p/security-audit
+          generateSarif: true
+
+      - name: Upload SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pip-audit
+        run: pip install pip-audit
+
+      - name: Run pip-audit
+        run: |
+          pip-audit \
+            --requirement <(pip freeze) \
+            --desc \
+            --output pip-audit-results.json \
+            --format json \
+            || true
+
+      - name: Annotate vulnerabilities
+        if: always()
+        run: |
+          if [ -f pip-audit-results.json ]; then
+            python3 -c "
+          import json, sys
+          with open('pip-audit-results.json') as f:
+              data = json.load(f)
+          for dep in data.get('dependencies', []):
+              for vuln in dep.get('vulns', []):
+                  print(f\"::warning title={dep['name']}::{dep['name']}=={dep['version']}: {vuln.get('id', 'UNKNOWN')} - {vuln.get('description', 'N/A')}\")
+          "
+          fi
+
+  secret-scanning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+  container-scan:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f deploy/docker/Dockerfile \
+            -t trust-safety:scan .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: trust-safety:scan
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          exit-code: "1"
+
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+
+  snyk-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Snyk
+        uses: snyk/actions/python@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --sarif-file-output=snyk-results.sarif
+
+      - name: Upload Snyk SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk-results.sarif
