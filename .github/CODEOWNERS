@@ -1,0 +1,23 @@
+* @quantumworld-dpdns-io
+
+# API
+src/api/ @quantumworld-dpdns-io
+
+# Moderation
+src/moderation/ @quantumworld-dpdns-io
+
+# Compliance
+src/compliance/ @quantumworld-dpdns-io
+
+# AI / ML
+src/ai/ @quantumworld-dpdns-io
+
+# Quantum
+src/quantum/ @quantumworld-dpdns-io
+
+# Infrastructure
+deploy/ @quantumworld-dpdns-io
+.github/ @quantumworld-dpdns-io
+
+# SDK
+sdk/ @quantumworld-dpdns-io
