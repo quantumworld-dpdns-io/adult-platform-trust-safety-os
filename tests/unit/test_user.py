@@ -11,11 +11,27 @@ from src.core.user import User
 
 
 def _make_user(**kwargs):
+    from datetime import datetime, timezone
     defaults = {
+        "id": uuid.uuid4(),
         "email": "alice@example.com",
         "username": "alice",
         "password_hash": "$argon2id$v=19$m=65536,t=3,p=4$fake",
         "roles": ["user"],
+        "age_verified": False,
+        "age_verified_at": None,
+        "risk_score": 0.0,
+        "is_active": True,
+        "is_banned": False,
+        "ban_reason": None,
+        "mfa_enabled": False,
+        "mfa_secret": None,
+        "last_login_at": None,
+        "last_login_ip": None,
+        "profile": None,
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+        "deleted_at": None,
     }
     defaults.update(kwargs)
     u = User()
