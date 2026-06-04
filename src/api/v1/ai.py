@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 import structlog
 from fastapi import APIRouter, Depends
 
-from src.api.dependencies import get_current_active_user, require_role
+from src.api.dependencies import require_role
 from src.api.exceptions import ValidationException
 from src.config.settings import settings
 
