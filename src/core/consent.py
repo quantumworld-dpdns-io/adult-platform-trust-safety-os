@@ -6,6 +6,7 @@ from enum import Enum
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .models import Base, UUIDMixin
 
@@ -55,9 +56,3 @@ class Consent(Base, UUIDMixin):
     @property
     def is_active(self) -> bool:
         return self.granted and self.withdrawn_at is None
-
-
-from typing import TYPE_CHECKING, Mapped as _Mapped  # noqa: E402  (avoid circular at module level)
-
-if TYPE_CHECKING:
-    pass
