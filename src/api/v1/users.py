@@ -9,13 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.dependencies import get_current_active_user, get_db_session, require_role
 from src.api.exceptions import NotFoundError, ValidationException
-from src.api.schemas.common import PaginatedResponse, PaginationParams
 from src.api.schemas.user import (
     AgeVerificationRequest,
     AgeVerificationResponse,
-    RiskScoreResponse,
     RiskFactorItem,
-    UserCreate,
+    RiskScoreResponse,
     UserListResponse,
     UserResponse,
     UserUpdate,
