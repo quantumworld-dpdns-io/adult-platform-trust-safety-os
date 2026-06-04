@@ -10,6 +10,7 @@ from fastapi import Depends, Header, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.exceptions import AuthenticationError, AuthorizationError
+from src.audit.logger import AuditLogger
 from src.auth.jwt import verify_token
 from src.auth.rbac import ROLE_PERMISSIONS, Role
 from src.config.settings import settings
