@@ -52,7 +52,7 @@ def test_password_strength_weak():
 
 
 def test_password_strength_medium():
-    result = check_password_strength("GoodPass1")
+    result = check_password_strength("Ab1!")
     assert result["strength"] == "medium"
     assert 3 <= result["score"] < 5
 
