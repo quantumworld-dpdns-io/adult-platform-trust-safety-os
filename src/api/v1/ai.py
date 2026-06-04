@@ -23,7 +23,7 @@ _model_metrics: dict[str, dict] = {
 @router.post("/classify")
 async def classify_content(
     body: dict,
-    current_user: User = Depends(require_current_active_user if False else require_role("admin", "moderator")),
+    current_user: User = Depends(require_role("admin", "moderator")),
 ) -> dict:
     content = body.get("content", "")
     content_type = body.get("content_type", "text")
