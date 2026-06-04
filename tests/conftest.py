@@ -6,18 +6,7 @@ import uuid
 from unittest.mock import Mock
 
 import fakeredis.aioredis
-import httpx
 import pytest
-
-from src.audit.models import ActionType, ActorType
-from tests.factories import (
-    AuditEventFactory,
-    ConsentFactory,
-    ContentFactory,
-    ReportFactory,
-    UserFactory,
-    UserSessionFactory,
-)
 
 
 @pytest.fixture
@@ -28,6 +17,7 @@ def app():
 
 @pytest.fixture
 async def async_client(app):
+    import httpx
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app),
         base_url="http://testserver",
@@ -65,16 +55,19 @@ def mock_ollama():
 
 @pytest.fixture
 def test_user():
+    from tests.factories import UserFactory
     return UserFactory()
 
 
 @pytest.fixture
 def test_content():
+    from tests.factories import ContentFactory
     return ContentFactory()
 
 
 @pytest.fixture
 def test_audit_event():
+    from tests.factories import AuditEventFactory
     return AuditEventFactory()
 
 
