@@ -8,10 +8,6 @@ from typing import Any
 
 from jose import jwt
 
-from src.audit.models import ActionType, ActorType, AuditEvent
-from src.core.user import User
-from src.moderation.content import Content, ContentStatus, ContentType
-
 
 def create_test_user(
     *,
@@ -20,7 +16,8 @@ def create_test_user(
     roles: list[str] | None = None,
     age_verified: bool = False,
     risk_score: float = 0.0,
-) -> User:
+):
+    from src.core.user import User
     user = User()
     user.email = email
     user.username = username
@@ -36,17 +33,16 @@ def create_test_user(
 def create_test_content(
     *,
     submitter_id: str | None = None,
-    content_type: ContentType = ContentType.TEXT,
     raw_content: str = "Test content for moderation",
-    status: ContentStatus = ContentStatus.PENDING,
     moderation_score: float | None = None,
-) -> Content:
+):
+    from src.moderation.content import Content, ContentStatus, ContentType
     content = Content()
     content.id = uuid.uuid4()
     content.submitter_id = submitter_id or str(uuid.uuid4())
-    content.content_type = content_type
+    content.content_type = ContentType.TEXT
     content.raw_content = raw_content
-    content.status = status
+    content.status = ContentStatus.PENDING
     content.moderation_score = moderation_score
     return content
 
@@ -54,18 +50,17 @@ def create_test_content(
 def create_test_audit_event(
     *,
     actor_id: str | None = None,
-    actor_type: ActorType = ActorType.USER,
-    action: ActionType = ActionType.CREATE,
     resource_type: str | None = None,
     resource_id: str | None = None,
     details: dict | None = None,
-) -> AuditEvent:
+):
+    from src.audit.models import ActionType, ActorType, AuditEvent
     event = AuditEvent()
     event.id = uuid.uuid4()
     event.timestamp = datetime.now(timezone.utc)
     event.actor_id = actor_id or str(uuid.uuid4())
-    event.actor_type = actor_type
-    event.action = action
+    event.actor_type = ActorType.USER
+    event.action = ActionType.CREATE
     event.resource_type = resource_type
     event.resource_id = resource_id
     event.details = details
