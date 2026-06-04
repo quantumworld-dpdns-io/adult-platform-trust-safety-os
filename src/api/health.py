@@ -85,7 +85,6 @@ async def liveness() -> HealthResponse:
 @router.get("/ready", response_model=HealthResponse)
 async def readiness(request: Request) -> HealthResponse:
     checks: dict[str, HealthCheckItem] = {}
-    session: AsyncSession | None = request.app.state.db_session_factory  # type: ignore[attr-defined]
     if hasattr(request.app.state, "db_session_factory"):
         async with request.app.state.db_session_factory() as sess:
             checks["database"] = await _check_db(sess)
