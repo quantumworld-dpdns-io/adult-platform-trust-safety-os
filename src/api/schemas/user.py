@@ -62,6 +62,14 @@ class AgeVerificationResponse(BaseModel):
     error: str | None = None
 
 
+class RiskFactorItem(BaseModel):
+    name: str
+    score: float
+    weight: float
+    details: dict
+    detected_at: datetime
+
+
 class RiskScoreResponse(BaseModel):
     user_id: uuid.UUID
     total_score: float
@@ -69,11 +77,3 @@ class RiskScoreResponse(BaseModel):
     factors: list[RiskFactorItem]
     assessed_at: datetime
     recommendations: list[str]
-
-
-class RiskFactorItem(BaseModel):
-    name: str
-    score: float
-    weight: float
-    details: dict
-    detected_at: datetime
