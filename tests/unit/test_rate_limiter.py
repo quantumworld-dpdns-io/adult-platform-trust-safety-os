@@ -80,7 +80,10 @@ def test_get_usage_stats(limiter):
     assert stats["window"] == 60
 
 
-def test_with_redis(redis_client):
+def test_with_redis():
+    import fakeredis
+    fake_server = fakeredis.FakeServer()
+    redis_client = fakeredis.FakeRedis(server=fake_server)
     limiter = SlidingWindowRateLimiter(redis_client=redis_client)
     limiter.configure_limits("api", max_requests=3, window_seconds=60)
     for _ in range(3):
