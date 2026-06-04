@@ -57,7 +57,7 @@ Send DELETE Request
     [Documentation]    Send a DELETE request
     [Arguments]    ${endpoint}    ${headers}=${None}
     IF    ${headers} is None
-        ${ headers}=    Create Auth Headers
+        ${headers}=    Create Auth Headers
     END
     ${response}=    Delete Request    api    ${endpoint}    headers=${headers}
     RETURN    ${response}
