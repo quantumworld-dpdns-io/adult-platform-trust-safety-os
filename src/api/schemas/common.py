@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import uuid
-from datetime import datetime
 from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
@@ -56,17 +54,17 @@ class ErrorResponse(BaseModel):
     )
 
 
+class HealthCheckItem(BaseModel):
+    status: str
+    latency_ms: float | None = None
+    detail: str | None = None
+
+
 class HealthResponse(BaseModel):
     status: str = Field(description="Overall health status")
     version: str = Field(description="Application version")
     uptime: float = Field(description="Uptime in seconds")
     checks: dict[str, HealthCheckItem] | None = Field(default=None)
-
-
-class HealthCheckItem(BaseModel):
-    status: str
-    latency_ms: float | None = None
-    detail: str | None = None
 
 
 class SuccessResponse(BaseModel):
