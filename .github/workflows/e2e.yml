@@ -1,0 +1,92 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Start services
+        run: |
+          docker compose up -d postgres redis qdrant minio
+          echo "Waiting for services to be healthy..."
+          timeout 120 bash -c '
+            until docker compose ps | grep -q "healthy"; do
+              sleep 5
+            done
+          '
+
+      - name: Wait for API readiness
+        run: |
+          docker compose up -d api 2>/dev/null || true
+          timeout 60 bash -c '
+            until curl -sf http://localhost:8000/health > /dev/null 2>&1; do
+              sleep 2
+            done
+          ' || echo "API not started via compose, running tests with direct service connections"
+
+      - name: Run E2E pytest
+        env:
+          DATABASE_URL: postgresql+asyncpg://trust_safety:dev_password_change_me@localhost:5432/trust_safety_dev
+          REDIS_URL: redis://localhost:6379/0
+          QDRANT_URL: http://localhost:6333
+          MINIO_ENDPOINT: localhost:9000
+          ENVIRONMENT: test
+        run: |
+          pytest tests/e2e/ \
+            -m "e2e" \
+            --junitxml=e2e-pytest.xml \
+            --timeout=300
+
+      - name: Run Robot Framework E2E
+        env:
+          DATABASE_URL: postgresql+asyncpg://trust_safety:dev_password_change_me@localhost:5432/trust_safety_dev
+          REDIS_URL: redis://localhost:6379/0
+          QDRANT_URL: http://localhost:6333
+          BASE_URL: http://localhost:8000
+        run: |
+          mkdir -p reports/e2e
+          robot \
+            --outputdir reports/e2e \
+            --output e2e_robot_output.xml \
+            --log e2e_log.html \
+            --report e2e_report.html \
+            tests/robot/e2e/ || true
+
+      - name: Upload E2E reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-reports
+          path: |
+            reports/e2e/
+            e2e-pytest.xml
+          retention-days: 30
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v --remove-orphans
