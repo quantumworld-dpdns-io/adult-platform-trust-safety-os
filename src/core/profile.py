@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .models import Base, TimestampMixin, UUIDMixin
 
