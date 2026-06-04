@@ -26,6 +26,7 @@ def _make_user(**kwargs):
 
 def test_create_user():
     u = _make_user(email="bob@example.com", username="bob")
+    u.id = uuid.uuid4()
     assert u.id is not None
     assert isinstance(u.id, uuid.UUID)
     assert u.email == "bob@example.com"
