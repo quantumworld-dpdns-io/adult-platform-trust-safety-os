@@ -1,0 +1,19 @@
+apiVersion: v2
+name: adult-platform-trust-safety
+description: Helm chart for the Adult Platform Trust & Safety OS
+type: application
+version: 0.1.0
+appVersion: "1.0.0-alpha.1"
+keywords:
+  - trust
+  - safety
+  - moderation
+  - compliance
+  - gdpr
+  - dsa
+  - coppa
+home: https://github.com/quantumworld-dpdns-io/adult-platform-trust-safety-os
+sources:
+  - https://github.com/quantumworld-dpdns-io/adult-platform-trust-safety-os
+maintainers:
+  - name: quantumworld-dpdns-io
