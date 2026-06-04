@@ -22,6 +22,7 @@ from tests.factories import (
 
 @pytest.fixture
 def app():
+    from src.api.app import create_app
     return create_app()
 
 
