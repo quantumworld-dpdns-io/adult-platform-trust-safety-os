@@ -6,10 +6,10 @@ import uuid
 from datetime import datetime, timezone
 
 import pytest
-
-from src.core.models import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
 from sqlalchemy import Column, String, create_engine
 from sqlalchemy.orm import Session
+
+from src.core.models import Base, SoftDeleteMixin, TimestampMixin, UUIDMixin
 
 
 class SampleModel(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
@@ -20,7 +20,7 @@ class SampleModel(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
 @pytest.fixture
 def db():
     engine = create_engine("sqlite:///:memory:")
-    Base.metadata.create_all(engine)
+    SampleModel.__table__.create(engine, checkfirst=True)
     with Session(engine) as session:
         yield session
 
@@ -111,7 +111,6 @@ def test_model_serialization_fields(db):
 
 
 def test_base_is_declarative():
-    assert issubclass(Base, object)
     assert hasattr(Base, "metadata")
 
 
