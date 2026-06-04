@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends
 from src.api.dependencies import require_role
 from src.api.exceptions import ValidationException
 from src.config.settings import settings
+from src.core.user import User
 
 logger = structlog.get_logger(__name__)
 
